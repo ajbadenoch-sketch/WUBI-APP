@@ -9,6 +9,8 @@ import Informes from './pages/Informes'
 import AskWubi from './pages/AskWubi'
 import Cartera from './pages/Cartera'
 import Grupos from './pages/Grupos'
+import NewTransaction from './pages/NewTransaction'
+import Toast from './components/Toast'
 
 function App() {
   const { session, loading, setSession, setLoading } = useAuthStore()
@@ -57,6 +59,7 @@ function App() {
 
   return (
     <BrowserRouter>
+      <Toast />
       <Routes>
         {!session ? (
           <>
@@ -71,33 +74,14 @@ function App() {
               <Route path="/ask-wubi" element={<AskWubi />} />
               <Route path="/cartera" element={<Cartera />} />
               <Route path="/grupos" element={<Grupos />} />
-              <Route path="/transaction/new" element={<NewTransaction />} />
             </Route>
+            <Route path="/transaction/new" element={<NewTransaction />} />
             <Route path="/login" element={<Navigate to="/dashboard" replace />} />
             <Route path="*" element={<Navigate to="/dashboard" replace />} />
           </>
         )}
       </Routes>
     </BrowserRouter>
-  )
-}
-
-function NewTransaction() {
-  return (
-    <div className="px-5 pt-14 pb-6">
-      <h1 className="text-2xl font-bold" style={{ color: '#1B4332' }}>
-        Nueva transacción
-      </h1>
-      <div
-        className="mt-6 rounded-2xl p-8 flex flex-col items-center gap-2"
-        style={{ backgroundColor: '#EDE8DF' }}
-      >
-        <span className="text-3xl">💸</span>
-        <p className="text-sm font-medium" style={{ color: '#1B4332', opacity: 0.5 }}>
-          Formulario de transacción próximamente
-        </p>
-      </div>
-    </div>
   )
 }
 
