@@ -9,6 +9,9 @@ import Informes from './pages/Informes'
 import AskWubi from './pages/AskWubi'
 import Cartera from './pages/Cartera'
 import Grupos from './pages/Grupos'
+import Metas from './pages/Metas'
+import Deudas from './pages/Deudas'
+import Recurrentes from './pages/Recurrentes'
 import NewTransaction from './pages/NewTransaction'
 import Toast from './components/Toast'
 
@@ -74,6 +77,9 @@ function App() {
               <Route path="/ask-wubi" element={<AskWubi />} />
               <Route path="/cartera" element={<Cartera />} />
               <Route path="/grupos" element={<Grupos />} />
+              <Route path="/metas" element={<Metas />} />
+              <Route path="/deudas" element={<Deudas />} />
+              <Route path="/recurrentes" element={<Recurrentes />} />
             </Route>
             <Route path="/transaction/new" element={<NewTransaction />} />
             <Route path="/login" element={<Navigate to="/dashboard" replace />} />
