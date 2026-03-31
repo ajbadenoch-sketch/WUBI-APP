@@ -12,6 +12,7 @@ import Grupos from './pages/Grupos'
 import Metas from './pages/Metas'
 import Deudas from './pages/Deudas'
 import Recurrentes from './pages/Recurrentes'
+import Calendario from './pages/Calendario'
 import NewTransaction from './pages/NewTransaction'
 import Toast from './components/Toast'
 
@@ -80,6 +81,7 @@ function App() {
               <Route path="/metas" element={<Metas />} />
               <Route path="/deudas" element={<Deudas />} />
               <Route path="/recurrentes" element={<Recurrentes />} />
+              <Route path="/calendario" element={<Calendario />} />
             </Route>
             <Route path="/transaction/new" element={<NewTransaction />} />
             <Route path="/login" element={<Navigate to="/dashboard" replace />} />
