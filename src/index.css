@@ -1,1 +1,29 @@
 @import "tailwindcss";
+
+@theme {
+  --color-wubi-green: #1B4332;
+  --color-wubi-cream: #F5F0E8;
+  --color-wubi-mint: #52B788;
+  --color-wubi-mint-light: #74C69D;
+  --color-wubi-cream-dark: #EDE8DF;
+}
+
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  background-color: #F5F0E8;
+  font-family: system-ui, -apple-system, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+#root {
+  max-width: 430px;
+  margin: 0 auto;
+  min-height: 100dvh;
+  position: relative;
+  background-color: #F5F0E8;
+  box-shadow: 0 0 40px rgba(0,0,0,0.12);
+}
