@@ -10,14 +10,11 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@headlessui/react": "^2.2.9",
     "@supabase/supabase-js": "^2.101.0",
-    "lucide-react": "^1.7.0",
     "openai": "^6.33.0",
     "react": "^19.2.4",
     "react-dom": "^19.2.4",
     "react-router-dom": "^6.30.3",
-    "recharts": "^3.8.1",
     "zustand": "^5.0.12"
   },
   "devDependencies": {

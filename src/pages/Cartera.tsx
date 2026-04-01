@@ -10,42 +10,6 @@ const BANCOS = [
   'Banco Azteca', 'Rappi', 'Mercado Pago', 'Stori', 'Otro',
 ]
 
-const BANCO_COLORS: Record<string, string> = {
-  'BBVA': '#004481',
-  'Banamex': '#003DA5',
-  'Santander': '#EC0000',
-  'HSBC': '#DB0011',
-  'Banorte': '#EB0029',
-  'Hey Banco': '#00C389',
-  'Nu': '#820AD1',
-  'Scotiabank': '#EC111A',
-  'Inbursa': '#003B71',
-  'BanCoppel': '#FF6600',
-  'Banco Azteca': '#00914C',
-  'Rappi': '#FF441F',
-  'Mercado Pago': '#009EE3',
-  'Stori': '#2D2D6E',
-  'Otro': '#6B7280',
-}
-
-const BANCO_ABBREV: Record<string, string> = {
-  'BBVA': 'BB',
-  'Banamex': 'BX',
-  'Santander': 'SN',
-  'HSBC': 'HS',
-  'Banorte': 'BN',
-  'Hey Banco': 'HB',
-  'Nu': 'Nu',
-  'Scotiabank': 'SB',
-  'Inbursa': 'IB',
-  'BanCoppel': 'BC',
-  'Banco Azteca': 'BA',
-  'Rappi': 'Rp',
-  'Mercado Pago': 'MP',
-  'Stori': 'St',
-  'Otro': '$$',
-}
-
 const TIPOS: { value: Account['tipo']; label: string }[] = [
   { value: 'debito', label: 'Débito' },
   { value: 'credito', label: 'Crédito' },
@@ -59,12 +23,12 @@ const COLORES = [
   '#3b82f6', '#ef4444', '#8b5cf6', '#14b8a6',
 ]
 
-const TIPO_LABELS: Record<Account['tipo'], string> = {
-  debito: 'Débito',
-  credito: 'Crédito',
-  ahorro: 'Ahorro',
-  inversion: 'Inversión',
-  efectivo: 'Efectivo',
+const TIPO_ICONS: Record<Account['tipo'], string> = {
+  debito: '💳',
+  credito: '💎',
+  ahorro: '🏦',
+  inversion: '📈',
+  efectivo: '💵',
 }
 
 type FormData = {
@@ -109,8 +73,6 @@ export default function Cartera() {
 
   useEffect(() => { fetchAccounts() }, [fetchAccounts])
 
-  const totalBalance = accounts.reduce((s, a) => s + a.saldo, 0)
-
   const openCreate = () => {
     setEditingId(null)
     setForm(emptyForm)
@@ -147,18 +109,17 @@ export default function Cartera() {
 
     const saldoNum = parseFloat(form.saldo) || 0
 
-    // Anti-duplicate check: same user_id + banco + nombre
-    const { data: exists } = await supabase
+    // Anti-duplicate check
+    const { data: existing } = await supabase
       .from('accounts')
       .select('id')
       .eq('user_id', user.id)
       .eq('banco', banco)
       .eq('nombre', nombre)
-      .single()
 
-    if (exists) {
-      // If editing, allow if the found account is the same one being edited
-      if (!editingId || exists.id !== editingId) {
+    if (existing && existing.length > 0) {
+      const isDuplicate = editingId ? existing.some((e) => e.id !== editingId) : true
+      if (isDuplicate) {
         setFormError('Ya tienes una cuenta con ese nombre en ese banco')
         return
       }
@@ -210,14 +171,7 @@ export default function Cartera() {
     <div className="px-5 pt-14 pb-6">
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
-        <div>
-          <h1 className="text-2xl font-bold" style={{ color: '#1B4332' }}>Cartera</h1>
-          {accounts.length > 0 && (
-            <p className="text-xs mt-0.5" style={{ color: '#1B4332', opacity: 0.5 }}>
-              {accounts.length} cuenta{accounts.length !== 1 ? 's' : ''}
-            </p>
-          )}
-        </div>
+        <h1 className="text-2xl font-bold" style={{ color: '#1B4332' }}>Cartera</h1>
         <button
           onClick={openCreate}
           className="w-10 h-10 rounded-full flex items-center justify-center active:scale-90 transition-transform"
@@ -229,17 +183,6 @@ export default function Cartera() {
           </svg>
         </button>
       </div>
-
-      {/* Total balance card */}
-      {accounts.length > 0 && (
-        <div className="rounded-2xl p-5 mb-5" style={{ backgroundColor: '#1B4332', boxShadow: '0 8px 32px rgba(27,67,50,0.25)' }}>
-          <p className="text-xs" style={{ color: 'rgba(245,240,232,0.5)' }}>Balance total</p>
-          <p className="text-3xl font-bold mt-1" style={{ color: '#F5F0E8' }}>
-            ${totalBalance.toLocaleString('es-MX', { minimumFractionDigits: 2 })}
-          </p>
-          <p className="text-[10px] mt-0.5" style={{ color: 'rgba(245,240,232,0.35)' }}>MXN</p>
-        </div>
-      )}
 
       {/* Accounts list */}
       {loading ? (
@@ -272,6 +215,18 @@ export default function Cartera() {
         </div>
       )}
 
+      {/* Total */}
+      {accounts.length > 0 && (
+        <div className="mt-5 rounded-2xl p-4" style={{ backgroundColor: '#1B4332' }}>
+          <div className="flex items-center justify-between">
+            <span className="text-sm" style={{ color: 'rgba(245,240,232,0.6)' }}>Balance total</span>
+            <span className="text-xl font-bold" style={{ color: '#F5F0E8' }}>
+              ${accounts.reduce((s, a) => s + a.saldo, 0).toLocaleString('es-MX', { minimumFractionDigits: 2 })}
+            </span>
+          </div>
+        </div>
+      )}
+
       {/* Form Modal */}
       {showForm && (
         <AccountFormModal
@@ -289,27 +244,8 @@ export default function Cartera() {
 }
 
 /* =============================================
-   Account Card with bank logo + swipe-to-delete
+   Account Card with swipe-to-delete
    ============================================= */
-
-function BankLogo({ banco, size = 44 }: { banco: string; size?: number }) {
-  const color = BANCO_COLORS[banco] || '#6B7280'
-  const abbrev = BANCO_ABBREV[banco] || banco.slice(0, 2).toUpperCase()
-  return (
-    <div
-      className="rounded-xl flex items-center justify-center font-bold text-white flex-shrink-0"
-      style={{
-        width: size,
-        height: size,
-        backgroundColor: color,
-        fontSize: size * 0.32,
-        letterSpacing: '-0.5px',
-      }}
-    >
-      {abbrev}
-    </div>
-  )
-}
 
 function AccountCard({
   account,
@@ -328,6 +264,7 @@ function AccountCard({
 }) {
   const containerRef = useRef<HTMLDivElement>(null)
   const startX = useRef(0)
+  const currentX = useRef(0)
   const swiping = useRef(false)
   const [offset, setOffset] = useState(0)
 
@@ -338,15 +275,23 @@ function AccountCard({
 
   const handleTouchMove = (e: React.TouchEvent) => {
     if (!swiping.current) return
-    const diff = startX.current - e.touches[0].clientX
-    setOffset(Math.max(0, Math.min(80, diff)))
+    currentX.current = e.touches[0].clientX
+    const diff = startX.current - currentX.current
+    // Only allow swipe left, clamped to 80px
+    const clamped = Math.max(0, Math.min(80, diff))
+    setOffset(clamped)
   }
 
   const handleTouchEnd = () => {
     swiping.current = false
-    setOffset(offset > 50 ? 80 : 0)
+    if (offset > 50) {
+      setOffset(80) // snap open
+    } else {
+      setOffset(0) // snap closed
+    }
   }
 
+  // Close swipe when tapping elsewhere
   useEffect(() => {
     if (offset === 0) return
     const handler = (e: TouchEvent | MouseEvent) => {
@@ -396,7 +341,7 @@ function AccountCard({
       {/* Delete background */}
       <div
         className="absolute inset-y-0 right-0 flex items-center justify-center rounded-2xl"
-        style={{ width: '80px', backgroundColor: '#E63946' }}
+        style={{ width: '80px', backgroundColor: '#DC2626' }}
       >
         <button onClick={onDelete} className="flex flex-col items-center gap-0.5 text-white">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -413,6 +358,7 @@ function AccountCard({
         style={{
           backgroundColor: 'white',
           transform: `translateX(-${offset}px)`,
+          borderLeft: `4px solid ${account.color}`,
         }}
         onTouchStart={handleTouchStart}
         onTouchMove={handleTouchMove}
@@ -420,13 +366,18 @@ function AccountCard({
         onClick={() => { if (offset === 0) onEdit() }}
       >
         <div className="flex items-center gap-3">
-          <BankLogo banco={account.banco} />
+          <div
+            className="w-11 h-11 rounded-xl flex items-center justify-center text-xl"
+            style={{ backgroundColor: account.color + '20' }}
+          >
+            {TIPO_ICONS[account.tipo]}
+          </div>
           <div className="flex-1 min-w-0">
             <p className="text-sm font-semibold truncate" style={{ color: '#1B4332' }}>
               {account.nombre}
             </p>
             <p className="text-xs" style={{ color: '#1B4332', opacity: 0.5 }}>
-              {account.banco} · {TIPO_LABELS[account.tipo]}
+              {account.banco} · {TIPOS.find((t) => t.value === account.tipo)?.label}
             </p>
           </div>
           <div className="text-right">
@@ -436,6 +387,10 @@ function AccountCard({
             <p className="text-[10px]" style={{ color: '#1B4332', opacity: 0.35 }}>MXN</p>
           </div>
         </div>
+        {/* Edit hint */}
+        <p className="text-[10px] text-right mt-1" style={{ color: '#1B4332', opacity: 0.25 }}>
+          Toca para editar · desliza para eliminar
+        </p>
       </div>
     </div>
   )
@@ -467,7 +422,10 @@ function AccountFormModal({
   return (
     <div className="fixed inset-0 z-50 flex items-end justify-center">
       {/* Backdrop */}
-      <div className="absolute inset-0 bg-black/40" onClick={onClose} />
+      <div
+        className="absolute inset-0 bg-black/40"
+        onClick={onClose}
+      />
 
       {/* Sheet */}
       <div
@@ -509,32 +467,17 @@ function AccountFormModal({
           <label className="text-xs font-medium mb-1.5 block" style={{ color: '#1B4332', opacity: 0.5 }}>
             Banco
           </label>
-          <div className="flex flex-wrap gap-2">
-            {BANCOS.map((b) => {
-              const isSelected = form.banco === b
-              return (
-                <button
-                  key={b}
-                  onClick={() => update({ banco: b })}
-                  className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold transition-all active:scale-95"
-                  style={{
-                    backgroundColor: isSelected ? BANCO_COLORS[b] : '#EDE8DF',
-                    color: isSelected ? 'white' : '#1B4332',
-                  }}
-                >
-                  {!isSelected && (
-                    <span
-                      className="w-4 h-4 rounded text-[8px] font-bold flex items-center justify-center text-white"
-                      style={{ backgroundColor: BANCO_COLORS[b] }}
-                    >
-                      {(BANCO_ABBREV[b] || b.slice(0, 2))[0]}
-                    </span>
-                  )}
-                  {b}
-                </button>
-              )
-            })}
-          </div>
+          <select
+            value={form.banco}
+            onChange={(e) => update({ banco: e.target.value })}
+            className="w-full rounded-xl px-4 py-3 text-sm outline-none appearance-none"
+            style={{ backgroundColor: '#EDE8DF', color: form.banco ? '#1B4332' : 'rgba(27,67,50,0.4)' }}
+          >
+            <option value="">Seleccionar banco</option>
+            {BANCOS.map((b) => (
+              <option key={b} value={b}>{b}</option>
+            ))}
+          </select>
         </div>
 
         {/* Tipo */}
@@ -553,7 +496,7 @@ function AccountFormModal({
                   color: form.tipo === t.value ? '#F5F0E8' : '#1B4332',
                 }}
               >
-                {t.label}
+                {TIPO_ICONS[t.value]} {t.label}
               </button>
             ))}
           </div>
@@ -598,19 +541,6 @@ function AccountFormModal({
             ))}
           </div>
         </div>
-
-        {/* Preview */}
-        {form.nombre && form.banco && (
-          <div className="rounded-xl p-3 mb-5 flex items-center gap-3" style={{ backgroundColor: '#EDE8DF' }}>
-            <BankLogo banco={form.banco} size={36} />
-            <div className="flex-1 min-w-0">
-              <p className="text-sm font-semibold truncate" style={{ color: '#1B4332' }}>{form.nombre}</p>
-              <p className="text-[10px]" style={{ color: '#1B4332', opacity: 0.5 }}>
-                {form.banco} · {TIPO_LABELS[form.tipo]}
-              </p>
-            </div>
-          </div>
-        )}
 
         {/* Actions */}
         <div className="flex gap-3">
