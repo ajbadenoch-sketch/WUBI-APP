@@ -13,7 +13,9 @@ import Metas from './pages/Metas'
 import Deudas from './pages/Deudas'
 import Recurrentes from './pages/Recurrentes'
 import Calendario from './pages/Calendario'
-import NewTransaction from './pages/NewTransaction'
+import TransactionAmount from './pages/TransactionAmount'
+import TransactionCategory from './pages/TransactionCategory'
+import TransactionDetails from './pages/TransactionDetails'
 import Toast from './components/Toast'
 
 function App() {
@@ -83,7 +85,10 @@ function App() {
               <Route path="/recurrentes" element={<Recurrentes />} />
               <Route path="/calendario" element={<Calendario />} />
             </Route>
-            <Route path="/transaction/new" element={<NewTransaction />} />
+            {/* Transaction flow — 3 separate routes, outside AppLayout (no bottom nav) */}
+            <Route path="/transaction/new" element={<TransactionAmount />} />
+            <Route path="/transaction/category" element={<TransactionCategory />} />
+            <Route path="/transaction/details" element={<TransactionDetails />} />
             <Route path="/login" element={<Navigate to="/dashboard" replace />} />
             <Route path="*" element={<Navigate to="/dashboard" replace />} />
           </>
