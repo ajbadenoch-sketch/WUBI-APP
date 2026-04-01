@@ -126,12 +126,12 @@ function TabMes({ transactions }: { transactions: Transaction[] }) {
       {/* Month summary */}
       <div className="grid grid-cols-3 gap-2 mb-4">
         <div className="rounded-xl p-3 text-center" style={{ backgroundColor: 'white' }}>
-          <p className="text-[10px] font-medium" style={{ color: '#22C55E' }}>Ingresos</p>
-          <p className="text-xs font-bold mt-0.5" style={{ color: '#22C55E' }}>{formatMXN(ingresos)}</p>
+          <p className="text-[10px] font-medium" style={{ color: '#52B788' }}>Ingresos</p>
+          <p className="text-xs font-bold mt-0.5" style={{ color: '#52B788' }}>{formatMXN(ingresos)}</p>
         </div>
         <div className="rounded-xl p-3 text-center" style={{ backgroundColor: 'white' }}>
-          <p className="text-[10px] font-medium" style={{ color: '#EF4444' }}>Gastos</p>
-          <p className="text-xs font-bold mt-0.5" style={{ color: '#EF4444' }}>{formatMXN(gastos)}</p>
+          <p className="text-[10px] font-medium" style={{ color: '#E63946' }}>Gastos</p>
+          <p className="text-xs font-bold mt-0.5" style={{ color: '#E63946' }}>{formatMXN(gastos)}</p>
         </div>
         <div className="rounded-xl p-3 text-center" style={{ backgroundColor: 'white' }}>
           <p className="text-[10px] font-medium" style={{ color: '#1B4332', opacity: 0.5 }}>Eventos</p>
@@ -183,8 +183,8 @@ function TabMes({ transactions }: { transactions: Transaction[] }) {
                 {day}
               </span>
               <div className="flex gap-0.5 h-1">
-                {hasGasto && <div className="w-1 h-1 rounded-full" style={{ backgroundColor: isSelected ? '#FCA5A5' : '#EF4444' }} />}
-                {hasIngreso && <div className="w-1 h-1 rounded-full" style={{ backgroundColor: isSelected ? '#86EFAC' : '#22C55E' }} />}
+                {hasGasto && <div className="w-1 h-1 rounded-full" style={{ backgroundColor: isSelected ? '#FCA5A5' : '#E63946' }} />}
+                {hasIngreso && <div className="w-1 h-1 rounded-full" style={{ backgroundColor: isSelected ? '#86EFAC' : '#52B788' }} />}
               </div>
             </button>
           )
@@ -285,8 +285,8 @@ function TabSemana({ transactions }: { transactions: Transaction[] }) {
               </span>
               <span className="text-sm font-bold" style={{ color: isSelected ? '#F5F0E8' : '#1B4332' }}>{day}</span>
               <div className="flex gap-0.5 h-1">
-                {hasGasto && <div className="w-1 h-1 rounded-full" style={{ backgroundColor: isSelected ? '#FCA5A5' : '#EF4444' }} />}
-                {hasIngreso && <div className="w-1 h-1 rounded-full" style={{ backgroundColor: isSelected ? '#86EFAC' : '#22C55E' }} />}
+                {hasGasto && <div className="w-1 h-1 rounded-full" style={{ backgroundColor: isSelected ? '#FCA5A5' : '#E63946' }} />}
+                {hasIngreso && <div className="w-1 h-1 rounded-full" style={{ backgroundColor: isSelected ? '#86EFAC' : '#52B788' }} />}
               </div>
             </button>
           )
