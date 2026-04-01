@@ -51,7 +51,7 @@ export default function Dashboard() {
   const periodGastos = sumByTipo(periodTxs, 'gasto')
   const ahorroNeto = periodIngresos - periodGastos
 
-  // Budget usage for period
+  // Budget usage for current month
   const now = new Date()
   const currentBudgets = budgets.filter((b) => b.mes === now.getMonth() + 1 && b.anio === now.getFullYear())
   const totalBudgeted = currentBudgets.reduce((s, b) => s + b.monto_presupuestado, 0)
@@ -61,7 +61,7 @@ export default function Dashboard() {
   )
   const budgetPct = totalBudgeted > 0 ? Math.min(100, Math.round((monthGastos / totalBudgeted) * 100)) : 0
 
-  // Week calendar with dots
+  // Week calendar strip with dots
   const weekDays = useMemo(() => {
     const ws = startOfWeek(refDate)
     return Array.from({ length: 7 }, (_, i) => {
@@ -75,15 +75,15 @@ export default function Dashboard() {
     })
   }, [refDate, transactions])
 
-  // Estimated transactions (upcoming this week)
+  // Upcoming estimated transactions (próximos)
   const today = new Date().toISOString().split('T')[0]
   const weekEnd = endOfWeek(new Date()).toISOString().split('T')[0]
   const estimadas = transactions.filter(
     (t) => t.es_estimada && t.fecha >= today && t.fecha <= weekEnd
   )
 
-  // Recent real transactions
-  const recentTxs = periodTxs.filter((t) => !t.es_estimada).slice(0, 8)
+  // Recent: last 5 real transactions in period
+  const recentTxs = periodTxs.filter((t) => !t.es_estimada).slice(0, 5)
 
   const navigatePeriod = (dir: number) => {
     setRefDate((prev) => {
@@ -162,7 +162,7 @@ export default function Dashboard() {
         </div>
       </div>
 
-      {/* Week calendar with dots */}
+      {/* Week calendar strip with colored dots */}
       {viewMode === 'semana' && (
         <div className="grid grid-cols-7 gap-1 mb-4">
           {weekDays.map((d, i) => {
@@ -182,8 +182,8 @@ export default function Dashboard() {
                   {d.date.getDate()}
                 </div>
                 <div className="flex gap-0.5 h-1.5">
-                  {d.hasGasto && <div className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: '#EF4444' }} />}
-                  {d.hasIngreso && <div className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: '#22C55E' }} />}
+                  {d.hasGasto && <div className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: '#E63946' }} />}
+                  {d.hasIngreso && <div className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: '#52B788' }} />}
                 </div>
               </div>
             )
@@ -191,18 +191,18 @@ export default function Dashboard() {
         </div>
       )}
 
-      {/* Balance card */}
+      {/* Balance card — verde oscuro */}
       <div className="rounded-2xl p-5 mb-3" style={{ backgroundColor: '#1B4332', boxShadow: '0 8px 32px rgba(27,67,50,0.25)' }}>
         <p className="text-xs" style={{ color: 'rgba(245,240,232,0.5)' }}>Balance disponible</p>
         <p className="text-3xl font-bold mt-1" style={{ color: '#F5F0E8' }}>{formatMXN(totalBalance)}</p>
         <p className="text-[10px] mt-0.5" style={{ color: 'rgba(245,240,232,0.35)' }}>MXN · {accounts.length} cuenta{accounts.length !== 1 ? 's' : ''}</p>
       </div>
 
-      {/* Secondary cards */}
+      {/* Ahorro neto + Presupuesto usado cards */}
       <div className="grid grid-cols-2 gap-3 mb-5">
         <div className="rounded-2xl p-4" style={{ backgroundColor: 'white' }}>
           <p className="text-[10px] font-medium" style={{ color: '#1B4332', opacity: 0.5 }}>Ahorro neto</p>
-          <p className="text-lg font-bold mt-0.5" style={{ color: ahorroNeto >= 0 ? '#22C55E' : '#EF4444' }}>
+          <p className="text-lg font-bold mt-0.5" style={{ color: ahorroNeto >= 0 ? '#52B788' : '#E63946' }}>
             {ahorroNeto >= 0 ? '+' : ''}{formatMXN(ahorroNeto)}
           </p>
           <p className="text-[10px]" style={{ color: '#1B4332', opacity: 0.35 }}>
@@ -211,7 +211,7 @@ export default function Dashboard() {
         </div>
         <div className="rounded-2xl p-4" style={{ backgroundColor: 'white' }}>
           <p className="text-[10px] font-medium" style={{ color: '#1B4332', opacity: 0.5 }}>Presupuesto usado</p>
-          <p className="text-lg font-bold mt-0.5" style={{ color: budgetPct > 90 ? '#EF4444' : budgetPct > 70 ? '#F59E0B' : '#1B4332' }}>
+          <p className="text-lg font-bold mt-0.5" style={{ color: budgetPct > 90 ? '#E63946' : budgetPct > 70 ? '#F59E0B' : '#1B4332' }}>
             {totalBudgeted > 0 ? `${budgetPct}%` : '—'}
           </p>
           <div className="mt-1.5 h-1.5 rounded-full overflow-hidden" style={{ backgroundColor: '#EDE8DF' }}>
@@ -219,14 +219,14 @@ export default function Dashboard() {
               className="h-full rounded-full transition-all"
               style={{
                 width: `${budgetPct}%`,
-                backgroundColor: budgetPct > 90 ? '#EF4444' : budgetPct > 70 ? '#F59E0B' : '#52B788',
+                backgroundColor: budgetPct > 90 ? '#E63946' : budgetPct > 70 ? '#F59E0B' : '#52B788',
               }}
             />
           </div>
         </div>
       </div>
 
-      {/* Shortcuts */}
+      {/* 4 shortcuts */}
       <div className="grid grid-cols-4 gap-2 mb-5">
         {[
           { label: 'Metas', icon: '🎯', path: '/metas' },
@@ -246,24 +246,27 @@ export default function Dashboard() {
         ))}
       </div>
 
-      {/* Wubi AI widget */}
-      <div className="rounded-2xl p-4 mb-5 flex items-start gap-3" style={{ backgroundColor: 'rgba(82,183,136,0.12)', border: '1px solid rgba(82,183,136,0.25)' }}>
-        <div className="w-9 h-9 rounded-full flex-shrink-0 flex items-center justify-center text-sm font-black" style={{ backgroundColor: '#52B788', color: 'white' }}>W</div>
-        <div>
-          <p className="text-xs font-semibold" style={{ color: '#1B4332' }}>Wubi AI</p>
-          <p className="text-xs mt-0.5" style={{ color: '#1B4332', opacity: 0.6 }}>
-            {periodGastos > 0
-              ? `Esta ${viewMode === 'semana' ? 'semana' : 'mes'} llevas ${formatMXN(periodGastos)} en gastos. ${ahorroNeto >= 0 ? '¡Vas bien! Sigue así.' : 'Cuidado, estás gastando más de lo que ingresas.'}`
-              : 'Registra tus transacciones y te daré insights personalizados sobre tus finanzas.'
-            }
-          </p>
-          <button onClick={() => navigate('/ask-wubi')} className="text-[11px] font-semibold mt-1.5" style={{ color: '#52B788' }}>
-            Pregúntale a Wubi →
-          </button>
+      {/* Wubi AI widget — hardcoded */}
+      <button
+        onClick={() => navigate('/ask-wubi')}
+        className="w-full rounded-2xl p-4 mb-5 flex items-center gap-3 text-left active:scale-[0.98] transition-transform"
+        style={{ backgroundColor: 'rgba(82,183,136,0.12)', border: '1px solid rgba(82,183,136,0.25)' }}
+      >
+        <div className="w-10 h-10 rounded-full flex-shrink-0 flex items-center justify-center text-sm font-black" style={{ backgroundColor: '#52B788', color: 'white' }}>
+          W
         </div>
-      </div>
+        <div className="flex-1">
+          <p className="text-sm font-semibold" style={{ color: '#1B4332' }}>Ask Wubi</p>
+          <p className="text-xs mt-0.5" style={{ color: '#1B4332', opacity: 0.6 }}>
+            Tu asesor financiero
+          </p>
+        </div>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#52B788" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+          <polyline points="9 6 15 12 9 18" />
+        </svg>
+      </button>
 
-      {/* Estimated upcoming */}
+      {/* Próximos — horizontal scroll */}
       {estimadas.length > 0 && (
         <div className="mb-5">
           <h2 className="text-sm font-semibold mb-2.5" style={{ color: '#1B4332' }}>Próximos · Esta semana</h2>
@@ -274,7 +277,7 @@ export default function Dashboard() {
                 <div key={tx.id} className="flex-shrink-0 w-36 rounded-2xl p-3" style={{ backgroundColor: 'white' }}>
                   <span className="text-lg">{cat.icono}</span>
                   <p className="text-xs font-medium mt-1 truncate" style={{ color: '#1B4332' }}>{tx.descripcion || cat.nombre}</p>
-                  <p className="text-sm font-bold mt-0.5" style={{ color: tx.tipo === 'gasto' ? '#EF4444' : '#22C55E' }}>
+                  <p className="text-sm font-bold mt-0.5" style={{ color: tx.tipo === 'gasto' ? '#E63946' : '#52B788' }}>
                     {tx.tipo === 'gasto' ? '-' : '+'}{formatMXN(tx.monto)}
                   </p>
                   <p className="text-[10px] mt-0.5" style={{ color: '#1B4332', opacity: 0.35 }}>{tx.fecha}</p>
@@ -285,7 +288,7 @@ export default function Dashboard() {
         </div>
       )}
 
-      {/* Recent activity */}
+      {/* Actividad reciente — últimas 5 */}
       <div>
         <h2 className="text-sm font-semibold mb-2.5" style={{ color: '#1B4332' }}>
           Actividad · {viewMode === 'semana' ? 'Esta semana' : 'Este mes'}
@@ -318,7 +321,7 @@ function TxRow({ tx, getCategoryInfo }: { tx: Transaction; getCategoryInfo: (id:
         <p className="text-sm font-medium truncate" style={{ color: '#1B4332' }}>{tx.descripcion || cat.nombre}</p>
         <p className="text-[10px]" style={{ color: '#1B4332', opacity: 0.4 }}>{tx.fecha}</p>
       </div>
-      <p className="text-sm font-bold" style={{ color: tx.tipo === 'gasto' ? '#EF4444' : '#22C55E' }}>
+      <p className="text-sm font-bold" style={{ color: tx.tipo === 'gasto' ? '#E63946' : '#52B788' }}>
         {tx.tipo === 'gasto' ? '-' : '+'}{formatMXN(tx.monto)}
       </p>
     </div>
